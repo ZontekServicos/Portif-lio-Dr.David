@@ -477,7 +477,7 @@ export default function App() {
             {[
               { icon: Award,   value: 'OAB/BA',   label: 'Inscrito e Ativo' },
               { icon: Briefcase, value: '5+ anos', label: 'de Experiência' },
-              { icon: MapPin,  value: 'Salvador',  label: 'e Grande Bahia' },
+              { icon: MapPin,  value: 'Salvador',  label: 'BA' },
               { icon: Users,   value: '200+',      label: 'Clientes Atendidos' },
             ].map(({ icon: Icon, value, label }, i) => (
               <motion.div
