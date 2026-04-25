@@ -4,7 +4,6 @@ import {
   useScroll,
   useTransform,
   AnimatePresence,
-  useInView,
   useMotionValue,
   useSpring,
   useMotionTemplate,
@@ -29,67 +28,6 @@ import {
   ArrowUp,
 } from 'lucide-react';
 import professionalPhoto from 'figma:asset/ea4499811dbcff2f321fd4b60be65790d594d985.png';
-
-/* ─────────────────────────────────────────────
-   Animated counter – counts up when scrolled into view
-───────────────────────────────────────────── */
-function StatCounter({
-  end,
-  suffix,
-  label,
-  delay = 0,
-}: {
-  end: number;
-  suffix: string;
-  label: string;
-  delay?: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-40px' });
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!isInView) return;
-    const timeout = setTimeout(() => {
-      const duration = 1800;
-      let startTime: number;
-      const animate = (ts: number) => {
-        if (!startTime) startTime = ts;
-        const progress = Math.min((ts - startTime) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        setCount(Math.floor(eased * end));
-        if (progress < 1) requestAnimationFrame(animate);
-        else setCount(end);
-      };
-      requestAnimationFrame(animate);
-    }, delay);
-    return () => clearTimeout(timeout);
-  }, [isInView, end, delay]);
-
-  return (
-    <div
-      ref={ref}
-      style={{
-        opacity: isInView ? 1 : 0,
-        transform: isInView ? 'translateY(0)' : 'translateY(20px)',
-        transition: `opacity 0.5s ease ${delay / 1000 + 0.1}s, transform 0.5s ease ${delay / 1000 + 0.1}s`,
-      }}
-      className="text-center group"
-    >
-      <div
-        className="text-4xl sm:text-5xl font-bold text-[#C8A96E]"
-        style={{ fontFamily: 'Playfair Display, serif' }}
-      >
-        {count}
-        {suffix}
-      </div>
-      <div className="w-6 h-px bg-[#C8A96E]/40 mx-auto my-2 group-hover:w-10 transition-all duration-300" />
-      <div className="text-xs sm:text-sm text-[#F5F0E8]/55 uppercase tracking-widest">
-        {label}
-      </div>
-    </div>
-  );
-}
 
 /* ─────────────────────────────────────────────
    Reusable section heading with gold divider
@@ -509,18 +447,6 @@ export default function App() {
               <ChevronDown className="w-6 h-6 text-[#C8A96E]" />
             </motion.div>
           </motion.div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════
-          STATS
-      ════════════════════════════════════════ */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-[#0F2A4A] border-y border-[#C8A96E]/10">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
-          <StatCounter end={5}   suffix="+"  label="Anos de Experiência" delay={0}   />
-          <StatCounter end={200} suffix="+"  label="Clientes Atendidos"  delay={150} />
-          <StatCounter end={98}  suffix="%"  label="Taxa de Satisfação"  delay={300} />
-          <StatCounter end={5}   suffix=""   label="Áreas de Atuação"    delay={450} />
         </div>
       </section>
 
