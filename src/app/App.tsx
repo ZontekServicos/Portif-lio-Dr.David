@@ -5,6 +5,9 @@ import {
   useTransform,
   AnimatePresence,
   useInView,
+  useMotionValue,
+  useSpring,
+  useMotionTemplate,
 } from 'motion/react';
 import {
   Scale,
@@ -123,6 +126,53 @@ function SectionHeading({
           {subtitle}
         </p>
       )}
+    </motion.div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   3D tilt card – mouse tracking + glare overlay
+───────────────────────────────────────────── */
+function Card3D({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const x = useSpring(rawX, { stiffness: 450, damping: 38 });
+  const y = useSpring(rawY, { stiffness: 450, damping: 38 });
+  const rotateX = useTransform(y, [-0.5, 0.5], [9, -9]);
+  const rotateY = useTransform(x, [-0.5, 0.5], [-9, 9]);
+  const glareX = useTransform(x, [-0.5, 0.5], [10, 90]);
+  const glareY = useTransform(y, [-0.5, 0.5], [10, 90]);
+  const glareBg = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(200,169,110,0.18) 0%, transparent 55%)`;
+
+  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    rawX.set((e.clientX - r.left) / r.width - 0.5);
+    rawY.set((e.clientY - r.top) / r.height - 0.5);
+  };
+  const handleLeave = () => { rawX.set(0); rawY.set(0); };
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
+      className={className}
+    >
+      {children}
+      {/* Glare that tracks the cursor */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl pointer-events-none"
+        style={{ background: glareBg }}
+      />
     </motion.div>
   );
 }
@@ -324,6 +374,28 @@ export default function App() {
         <div className="absolute top-1/4 left-8 sm:left-20 w-72 h-72 sm:w-[26rem] sm:h-[26rem] bg-[#C8A96E]/8 rounded-full blur-3xl animate-float-1 pointer-events-none" />
         <div className="absolute bottom-1/4 right-8 sm:right-20 w-80 h-80 sm:w-[30rem] sm:h-[30rem] bg-[#C8A96E]/5 rounded-full blur-3xl animate-float-2 pointer-events-none" />
 
+        {/* ── 3D floating geometric decorations (desktop only) ── */}
+        <div className="absolute top-36 right-[14%] hidden lg:block pointer-events-none animate-float-geo-1">
+          <div className="w-10 h-10 border-2 border-[#C8A96E]/30 rotate-45"
+               style={{ boxShadow: '4px 4px 16px rgba(200,169,110,0.2), inset 0 0 8px rgba(200,169,110,0.05)', transformStyle: 'preserve-3d' }} />
+        </div>
+        <div className="absolute top-[58%] left-[10%] hidden lg:block pointer-events-none animate-float-geo-2">
+          <div className="w-6 h-6 border border-[#C8A96E]/25 rotate-12"
+               style={{ boxShadow: '3px 3px 10px rgba(200,169,110,0.15)', transformStyle: 'preserve-3d' }} />
+        </div>
+        <div className="absolute top-[28%] left-[18%] hidden lg:block pointer-events-none animate-float-geo-3">
+          <div className="w-4 h-4 bg-[#C8A96E]/12 rotate-45"
+               style={{ boxShadow: '2px 2px 8px rgba(200,169,110,0.2)' }} />
+        </div>
+        <div className="absolute bottom-[28%] right-[18%] hidden lg:block pointer-events-none animate-float-geo-2" style={{ animationDelay: '2s' }}>
+          <div className="w-5 h-5 border border-[#C8A96E]/20 rounded-sm rotate-[20deg]"
+               style={{ boxShadow: '2px 2px 10px rgba(200,169,110,0.12)' }} />
+        </div>
+        <div className="absolute top-[45%] right-[8%] hidden xl:block pointer-events-none animate-float-geo-1" style={{ animationDelay: '3.5s' }}>
+          <div className="w-3 h-3 bg-[#C8A96E]/18 rotate-45"
+               style={{ boxShadow: '1px 1px 6px rgba(200,169,110,0.2)' }} />
+        </div>
+
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           {/* Photo with rotating gradient border */}
           <motion.div
@@ -367,7 +439,12 @@ export default function App() {
 
           <motion.h1
             className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mb-4 text-[#FFFFFF]"
-            style={{ fontFamily: 'Playfair Display, serif', fontWeight: 700 }}
+            style={{
+              fontFamily: 'Playfair Display, serif',
+              fontWeight: 700,
+              textShadow:
+                '1px 1px 0 rgba(200,169,110,0.25), 2px 2px 0 rgba(200,169,110,0.18), 3px 3px 0 rgba(200,169,110,0.12), 4px 4px 0 rgba(200,169,110,0.07), 5px 5px 12px rgba(0,0,0,0.4)',
+            }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.45 }}
@@ -485,21 +562,23 @@ export default function App() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.12 }}
                 whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                className="relative bg-[#0F2A4A] border border-[#C8A96E]/20 rounded-2xl p-8 hover:border-[#C8A96E]/50 transition-all duration-300 hover:shadow-xl hover:shadow-[#C8A96E]/10 overflow-hidden group"
+                style={{ perspective: '1000px' }}
               >
-                {/* Top border reveal */}
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C8A96E] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <Card3D className="relative bg-[#0F2A4A] border border-[#C8A96E]/20 rounded-2xl p-8 hover:border-[#C8A96E]/50 transition-all duration-300 hover:shadow-xl hover:shadow-[#C8A96E]/10 overflow-hidden group h-full">
+                  {/* Top border reveal */}
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C8A96E] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                <div className="bg-[#C8A96E]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6 group-hover:bg-[#C8A96E]/20 group-hover:scale-110 transition-all duration-300">
-                  <item.icon className="w-7 h-7 text-[#C8A96E]" />
-                </div>
-                <h3
-                  className="text-xl mb-3 text-[#FFFFFF]"
-                  style={{ fontFamily: 'Playfair Display, serif', fontWeight: 600 }}
-                >
-                  {item.title}
-                </h3>
-                <p className="text-[#F5F0E8]/70 leading-relaxed">{item.description}</p>
+                  <div className="bg-[#C8A96E]/10 w-14 h-14 rounded-full flex items-center justify-center mb-6 group-hover:bg-[#C8A96E]/20 group-hover:scale-110 transition-all duration-300">
+                    <item.icon className="w-7 h-7 text-[#C8A96E]" />
+                  </div>
+                  <h3
+                    className="text-xl mb-3 text-[#FFFFFF]"
+                    style={{ fontFamily: 'Playfair Display, serif', fontWeight: 600 }}
+                  >
+                    {item.title}
+                  </h3>
+                  <p className="text-[#F5F0E8]/70 leading-relaxed">{item.description}</p>
+                </Card3D>
               </motion.div>
             ))}
           </div>
@@ -556,21 +635,24 @@ export default function App() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                style={{ perspective: '1000px' }}
                 /* Last card: centered when alone in a 2-col grid */
-                className={`relative bg-[#16213E] border border-[#C8A96E]/20 rounded-2xl p-8 hover:border-[#C8A96E]/50 transition-all duration-300 hover:shadow-xl hover:shadow-[#C8A96E]/10 group overflow-hidden${index === 4 ? ' sm:col-span-2 sm:max-w-lg sm:mx-auto w-full' : ''}`}
+                className={index === 4 ? 'sm:col-span-2 sm:max-w-lg sm:mx-auto w-full' : ''}
               >
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C8A96E] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <Card3D className="relative bg-[#16213E] border border-[#C8A96E]/20 rounded-2xl p-8 hover:border-[#C8A96E]/50 transition-all duration-300 hover:shadow-xl hover:shadow-[#C8A96E]/10 group overflow-hidden h-full">
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C8A96E] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                <div className="bg-[#C8A96E]/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#C8A96E]/20 group-hover:scale-110 transition-all duration-300">
-                  <area.icon className="w-8 h-8 text-[#C8A96E]" />
-                </div>
-                <h3
-                  className="text-xl sm:text-2xl mb-3 text-[#FFFFFF]"
-                  style={{ fontFamily: 'Playfair Display, serif', fontWeight: 600 }}
-                >
-                  {area.title}
-                </h3>
-                <p className="text-[#F5F0E8]/70 leading-relaxed">{area.description}</p>
+                  <div className="bg-[#C8A96E]/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#C8A96E]/20 group-hover:scale-110 transition-all duration-300">
+                    <area.icon className="w-8 h-8 text-[#C8A96E]" />
+                  </div>
+                  <h3
+                    className="text-xl sm:text-2xl mb-3 text-[#FFFFFF]"
+                    style={{ fontFamily: 'Playfair Display, serif', fontWeight: 600 }}
+                  >
+                    {area.title}
+                  </h3>
+                  <p className="text-[#F5F0E8]/70 leading-relaxed">{area.description}</p>
+                </Card3D>
               </motion.div>
             ))}
           </div>
@@ -593,38 +675,40 @@ export default function App() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.12 }}
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                className="relative bg-[#0F2A4A] border border-[#C8A96E]/20 rounded-2xl p-8 hover:border-[#C8A96E]/50 transition-all duration-300 hover:shadow-xl hover:shadow-[#C8A96E]/10 group overflow-hidden"
+                style={{ perspective: '1000px' }}
               >
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C8A96E] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <Card3D className="relative bg-[#0F2A4A] border border-[#C8A96E]/20 rounded-2xl p-8 hover:border-[#C8A96E]/50 transition-all duration-300 hover:shadow-xl hover:shadow-[#C8A96E]/10 group overflow-hidden h-full">
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C8A96E] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                {/* Decorative quote mark */}
-                <div
-                  className="text-[#C8A96E]/10 text-8xl leading-none mb-1 select-none"
-                  aria-hidden
-                  style={{ fontFamily: 'Georgia, serif' }}
-                >
-                  ❝
-                </div>
-
-                <div className="flex gap-1 mb-4">
-                  {[...Array(dep.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-[#C8A96E] text-[#C8A96E]" />
-                  ))}
-                </div>
-                <p className="text-[#F5F0E8]/80 leading-relaxed mb-6 italic text-sm sm:text-base">
-                  "{dep.text}"
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-[#C8A96E]/20 flex items-center justify-center text-[#C8A96E] font-bold shrink-0">
-                    {dep.name.charAt(0)}
-                  </div>
-                  <p
-                    className="text-[#E8D5B0]"
-                    style={{ fontFamily: 'Playfair Display, serif', fontWeight: 600 }}
+                  {/* Decorative quote mark */}
+                  <div
+                    className="text-[#C8A96E]/10 text-8xl leading-none mb-1 select-none"
+                    aria-hidden
+                    style={{ fontFamily: 'Georgia, serif' }}
                   >
-                    {dep.name}
+                    ❝
+                  </div>
+
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(dep.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-[#C8A96E] text-[#C8A96E]" />
+                    ))}
+                  </div>
+                  <p className="text-[#F5F0E8]/80 leading-relaxed mb-6 italic text-sm sm:text-base">
+                    "{dep.text}"
                   </p>
-                </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-[#C8A96E]/20 flex items-center justify-center text-[#C8A96E] font-bold shrink-0">
+                      {dep.name.charAt(0)}
+                    </div>
+                    <p
+                      className="text-[#E8D5B0]"
+                      style={{ fontFamily: 'Playfair Display, serif', fontWeight: 600 }}
+                    >
+                      {dep.name}
+                    </p>
+                  </div>
+                </Card3D>
               </motion.div>
             ))}
           </div>

@@ -30,3 +30,20 @@
   to   { transform: rotate(360deg); }
 }
 .rotate-conic { animation: rotate-conic 6s linear infinite; }
+
+/* ── 3D floating geometric shapes (hero) ── */
+@keyframes float-geo-1 {
+  0%, 100% { transform: rotate(45deg) translateY(0px)  rotateX(0deg)  scale(1);    }
+  50%       { transform: rotate(55deg) translateY(-14px) rotateX(25deg) scale(1.08); }
+}
+@keyframes float-geo-2 {
+  0%, 100% { transform: rotate(12deg) translateY(0px)  rotateY(0deg)  scale(1);    }
+  50%       { transform: rotate(22deg) translateY(-10px) rotateY(20deg) scale(1.06); }
+}
+@keyframes float-geo-3 {
+  0%, 100% { transform: rotate(45deg) scale(1)   translateZ(0);  }
+  50%       { transform: rotate(60deg) scale(1.4) translateZ(8px); }
+}
+.animate-float-geo-1 { animation: float-geo-1  7s ease-in-out infinite; }
+.animate-float-geo-2 { animation: float-geo-2  9s ease-in-out infinite; }
+.animate-float-geo-3 { animation: float-geo-3  5s ease-in-out infinite; }
