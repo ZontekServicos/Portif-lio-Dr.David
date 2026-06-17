@@ -154,16 +154,25 @@ export default function App() {
       name: 'Maria Silva',
       text: 'Profissional extremamente competente e atencioso. Resolveu meu caso com agilidade e transparência. Recomendo sem reservas!',
       rating: 5,
+      photo: 'https://randomuser.me/api/portraits/women/44.jpg',
     },
     {
       name: 'João Santos',
       text: 'Excelente advogado! Me orientou em todas as etapas do processo e conseguiu um resultado muito além das minhas expectativas. Muito obrigado!',
       rating: 5,
+      photo: 'https://randomuser.me/api/portraits/men/32.jpg',
     },
     {
       name: 'Ana Oliveira',
       text: 'Muito profissional e dedicado. Senti total segurança durante todo o processo. Com certeza voltarei a contratar seus serviços.',
       rating: 5,
+      photo: 'https://randomuser.me/api/portraits/women/68.jpg',
+    },
+    {
+      name: 'Guilherme Santana',
+      text: 'Dr. Christian me ajudou a resolver uma situação que parecia sem saída. Profissional ético, transparente e muito competente. Indico com toda a confiança!',
+      rating: 5,
+      photo: 'https://randomuser.me/api/portraits/men/85.jpg',
     },
   ];
 
@@ -751,7 +760,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto">
           <SectionHeading title="Depoimentos" subtitle="O que dizem nossos clientes" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             {testimonials.map((dep, index) => (
               <motion.div
                 key={index}
@@ -783,8 +792,18 @@ export default function App() {
                     "{dep.text}"
                   </p>
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-[#C8A96E]/20 flex items-center justify-center text-[#C8A96E] font-bold shrink-0">
-                      {dep.name.charAt(0)}
+                    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 ring-2 ring-[#C8A96E]/40">
+                      <img
+                        src={dep.photo}
+                        alt={dep.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const el = e.currentTarget;
+                          el.style.display = 'none';
+                          el.parentElement!.classList.add('bg-[#C8A96E]/20', 'flex', 'items-center', 'justify-center');
+                          el.parentElement!.textContent = dep.name.charAt(0);
+                        }}
+                      />
                     </div>
                     <p
                       className="text-[#E8D5B0]"
