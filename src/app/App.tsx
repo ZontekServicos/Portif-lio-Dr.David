@@ -448,7 +448,7 @@ export default function App() {
               whileTap={{ scale: 0.97 }}
               className="w-full sm:w-auto bg-[#C8A96E] text-[#1A1A2E] px-8 py-4 rounded-full shadow-lg shadow-[#C8A96E]/30 font-semibold text-base transition-colors hover:bg-[#E8D5B0]"
             >
-              Agendar Consulta Gratuita
+              Agendar Consulta
             </motion.button>
             <motion.button
               onClick={() => scrollToSection('areas')}
