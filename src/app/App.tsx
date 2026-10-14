@@ -33,6 +33,7 @@ import {
 import professionalPhoto from 'figma:asset/ea4499811dbcff2f321fd4b60be65790d594d985.png';
 import brenoSantosPhoto from 'figma:asset/breno-santos.png';
 import guilhermeSantanaPhoto from 'figma:asset/guilherme-santana.png';
+import logoCA from 'figma:asset/logo-ca.png';
 
 /* ─────────────────────────────────────────────
    Reusable section heading with gold divider
@@ -203,10 +204,15 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             <h2
-              className="text-xl sm:text-2xl font-bold text-[#C8A96E] cursor-pointer select-none"
+              className="flex items-center gap-3 text-xl sm:text-2xl font-bold text-[#C8A96E] cursor-pointer select-none"
               style={{ fontFamily: 'Playfair Display, serif' }}
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
+              <img
+                src={logoCA}
+                alt="Logo Christian Almeida"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover ring-1 ring-[#C8A96E]/30"
+              />
               Dr. Christian Almeida
             </h2>
 
