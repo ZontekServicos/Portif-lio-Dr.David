@@ -31,6 +31,8 @@ import {
   Clock,
 } from 'lucide-react';
 import professionalPhoto from 'figma:asset/ea4499811dbcff2f321fd4b60be65790d594d985.png';
+import brenoSantosPhoto from 'figma:asset/breno-santos.png';
+import guilhermeSantanaPhoto from 'figma:asset/guilherme-santana.png';
 
 /* ─────────────────────────────────────────────
    Reusable section heading with gold divider
@@ -157,10 +159,10 @@ export default function App() {
       photo: 'https://randomuser.me/api/portraits/women/44.jpg',
     },
     {
-      name: 'João Santos',
-      text: 'Excelente advogado! Me orientou em todas as etapas do processo e conseguiu um resultado muito além das minhas expectativas. Muito obrigado!',
+      name: 'Breno Santos',
+      text: 'Só tenho a agradecer ao Dr. Christian Almeida pelo excelente trabalho e pela atenção de sempre. Profissional sério, competente e que realmente passa confiança. Sem dúvidas, recomendo!',
       rating: 5,
-      photo: 'https://randomuser.me/api/portraits/men/32.jpg',
+      photo: brenoSantosPhoto,
     },
     {
       name: 'Ana Oliveira',
@@ -172,7 +174,7 @@ export default function App() {
       name: 'Guilherme Santana',
       text: 'Dr. Christian me ajudou a resolver uma situação que parecia sem saída. Profissional ético, transparente e muito competente. Indico com toda a confiança!',
       rating: 5,
-      photo: 'https://randomuser.me/api/portraits/men/85.jpg',
+      photo: guilhermeSantanaPhoto,
     },
   ];
 
